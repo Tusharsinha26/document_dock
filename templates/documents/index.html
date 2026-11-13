@@ -1,0 +1,330 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}All Documents — DocumentDock{% endblock %}
+{% block page_title %}Document Repository{% endblock %}
+
+{% block app_content %}
+<!-- Document Toolbar: Search & Filters -->
+<div class="filter-toolbar">
+  <!-- Search and Actions Bar -->
+  <form method="GET" action="{% url 'documents_list' %}" style="display: flex; gap: 1rem; align-items: center; width: 100%; flex-wrap: wrap;">
+    <div class="search-input-wrap" style="flex: 1; min-width: 260px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input 
+        type="text" 
+        name="q" 
+        id="tableSearchInput"
+        class="search-input" 
+        placeholder="Filter by title, reference number, issuing authority, or notes..." 
+        value="{{ search_query }}"
+        autocomplete="off"
+      >
+    </div>
+
+    <!-- Hidden preserved filters -->
+    <input type="hidden" name="category" value="{{ selected_category }}">
+    <input type="hidden" name="status" value="{{ selected_status }}">
+
+    <!-- Sort selector -->
+    <div style="min-width: 190px;">
+      <select name="sort" class="form-select" onchange="this.form.submit()" style="padding: 0.72rem 0.95rem; font-size: 0.88rem;">
+        <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Sort: Recently Added</option>
+        <option value="expiry_asc" {% if selected_sort == 'expiry_asc' %}selected{% endif %}>Sort: Expiry (Soonest first)</option>
+        <option value="expiry_desc" {% if selected_sort == 'expiry_desc' %}selected{% endif %}>Sort: Expiry (Furthest first)</option>
+        <option value="title" {% if selected_sort == 'title' %}selected{% endif %}>Sort: Title (A–Z)</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-secondary btn-sm" style="padding: 0.72rem 1.4rem;">
+      Search
+    </button>
+  </form>
+
+  <div class="editorial-rule" style="margin: 0.75rem 0;"></div>
+
+  <!-- Category Filter Pills -->
+  <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+      <span style="font-family: var(--font-mono); font-size: 0.74rem; text-transform: uppercase; color: var(--c-charcoal-subtle); font-weight: 600;">Category:</span>
+      <div class="filter-pills-row">
+        {% for cat in categories %}
+          <a 
+            href="?q={{ search_query }}&category={{ cat|urlencode }}&status={{ selected_status|urlencode }}&sort={{ selected_sort }}" 
+            class="filter-tab {% if selected_category == cat %}active{% endif %}"
+          >
+            {{ cat }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Status Filter Pills -->
+    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+      <span style="font-family: var(--font-mono); font-size: 0.74rem; text-transform: uppercase; color: var(--c-charcoal-subtle); font-weight: 600;">Status:</span>
+      <div class="filter-pills-row">
+        {% for stat in statuses %}
+          <a 
+            href="?q={{ search_query }}&category={{ selected_category|urlencode }}&status={{ stat|urlencode }}&sort={{ selected_sort }}" 
+            class="filter-tab {% if selected_status == stat %}active{% endif %}"
+          >
+            {{ stat }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Documents Repository View Header & View Switcher -->
+<div class="panel-card">
+  <div class="panel-header">
+    <div>
+      <h3 class="panel-title">Archived Records</h3>
+      <span style="font-size: 0.82rem; color: var(--c-charcoal-subtle);">
+        Showing {{ total_count }} document{% if total_count != 1 %}s{% endif %} matching your active criteria
+      </span>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+      <!-- Table / Grid Toggle -->
+      <div style="display: inline-flex; background: var(--c-ivory); border: 1px solid var(--c-border); border-radius: 4px; padding: 2px;">
+        <button type="button" id="toggleTableViewBtn" class="btn btn-sm" style="padding: 0.3rem 0.65rem; font-size: 0.78rem; background: var(--c-white); border-color: var(--c-border); box-shadow: var(--shadow-subtle);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          <span>Table</span>
+        </button>
+        <button type="button" id="toggleGridViewBtn" class="btn btn-sm" style="padding: 0.3rem 0.65rem; font-size: 0.78rem; background: transparent; border: none; color: var(--c-charcoal-muted);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span>Grid</span>
+        </button>
+      </div>
+
+      <a href="{% url 'export_vault' %}" class="btn btn-secondary btn-sm" title="Download JSON ledger of all your documents">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <span>Export Ledger</span>
+      </a>
+      <a href="{% url 'document_add' %}" class="btn btn-primary btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span>New Document</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- TABLE VIEW -->
+  <div id="tableViewContainer" class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>DOCUMENT TITLE & REFERENCE</th>
+          <th>CATEGORY</th>
+          <th>ISSUED BY</th>
+          <th>EXPIRY TIMELINE</th>
+          <th>STATUS</th>
+          <th style="text-align: right;">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if documents %}
+          {% for doc in documents %}
+            <tr class="filterable-doc-row" data-search="{{ doc.title|lower }} {{ doc.document_number|lower }} {{ doc.issuing_authority|lower }} {{ doc.notes|lower }} {{ doc.category|lower }}">
+              <td>
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                  <div class="doc-icon-badge" style="width: 36px; height: 36px; background: {{ doc.category_meta.bg }}; color: {{ doc.category_meta.color }};">
+                    {% if doc.category == 'Identity & Travel' %}
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                    {% elif doc.category == 'Vehicles & Transport' %}
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect></svg>
+                    {% elif doc.category == 'Insurance & Health' %}
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    {% else %}
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    {% endif %}
+                  </div>
+                  <div>
+                    <a href="{% url 'document_detail' doc.id %}" class="table-doc-title">
+                      {{ doc.title }}
+                    </a>
+                    <span class="table-doc-number">{{ doc.document_number|default:"No reference" }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="category-pill">{{ doc.category }}</span>
+              </td>
+              <td>
+                <span style="font-size: 0.88rem; color: var(--c-charcoal);">{{ doc.issuing_authority|default:"—" }}</span>
+              </td>
+              <td>
+                <div style="display: flex; flex-direction: column;">
+                  <span style="font-size: 0.88rem; font-weight: 600; color: {% if doc.status == 'Expiring Soon' %}var(--c-terracotta){% elif doc.status == 'Expired' %}#B93838{% else %}var(--c-forest-dark){% endif %};">
+                    {{ doc.human_delta }}
+                  </span>
+                  <span style="font-family: var(--font-mono); font-size: 0.76rem; color: var(--c-charcoal-subtle);">
+                    {{ doc.formatted_expiry_date }}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <span class="status-pill {{ doc.urgency_class }}">{{ doc.badge_text }}</span>
+              </td>
+              <td style="text-align: right;">
+                <div style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <a href="{% url 'document_detail' doc.id %}" class="btn btn-secondary btn-sm" title="View details" style="padding: 0.35rem 0.7rem;">
+                    View
+                  </a>
+                  <a href="{% url 'document_edit' doc.id %}" class="btn btn-secondary btn-sm" title="Edit document" style="padding: 0.35rem 0.7rem;">
+                    Edit
+                  </a>
+                  <form method="POST" action="{% url 'document_delete' doc.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-secondary btn-sm btn-confirm-delete" data-title="{{ doc.title }}" title="Delete record" style="padding: 0.35rem 0.7rem; color: #B93838;">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="6" style="padding: 4rem 2rem; text-align: center;">
+              <div style="max-width: 360px; margin: 0 auto;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--c-ivory-dark); margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center; color: var(--c-charcoal-subtle);">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+                <h4 style="font-family: var(--font-serif); font-size: 1.25rem; color: var(--c-forest-dark); margin-bottom: 0.5rem;">No documents matched your criteria</h4>
+                <p style="font-size: 0.92rem; color: var(--c-charcoal-muted); margin-bottom: 1.5rem;">
+                  Try adjusting your search query, or clear your category and status filters.
+                </p>
+                <a href="{% url 'documents_list' %}" class="btn btn-secondary btn-sm">Clear All Filters</a>
+              </div>
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CARD GRID VIEW (Initially hidden or toggleable) -->
+  <div id="gridViewContainer" style="display: none; padding: 1.6rem;">
+    {% if documents %}
+      <div class="documents-grid-view">
+        {% for doc in documents %}
+          <div class="doc-grid-card filterable-doc-row" data-search="{{ doc.title|lower }} {{ doc.document_number|lower }} {{ doc.issuing_authority|lower }} {{ doc.notes|lower }} {{ doc.category|lower }}">
+            <div class="doc-card-category-ribbon" style="background-color: {{ doc.category_meta.color }};"></div>
+            
+            <div>
+              <div class="doc-card-top">
+                <span class="category-pill" style="font-size: 0.74rem;">{{ doc.category }}</span>
+                <span class="status-pill {{ doc.urgency_class }}" style="font-size: 0.72rem;">{{ doc.badge_text }}</span>
+              </div>
+
+              <h4 class="doc-card-title">
+                <a href="{% url 'document_detail' doc.id %}" style="color: inherit;">
+                  {{ doc.title }}
+                </a>
+              </h4>
+
+              <div class="doc-card-num">
+                {{ doc.document_number|default:"No reference code" }} &bull; {{ doc.issuing_authority|default:"Self-certified" }}
+              </div>
+
+              <div style="margin-top: 1.25rem; background: var(--c-ivory); border: 1px solid var(--c-border); padding: 0.85rem; border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.35rem;">
+                  <span style="color: var(--c-charcoal-subtle);">Remaining:</span>
+                  <strong style="color: {% if doc.status == 'Expiring Soon' %}var(--c-terracotta){% elif doc.status == 'Expired' %}#B93838{% else %}var(--c-forest){% endif %};">
+                    {{ doc.human_delta }}
+                  </strong>
+                </div>
+                <div style="font-size: 0.76rem; color: var(--c-charcoal-subtle); font-family: var(--font-mono);">
+                  Expiry Date: {{ doc.formatted_expiry_date }}
+                </div>
+              </div>
+            </div>
+
+            <div class="doc-card-footer">
+              <a href="{% url 'document_detail' doc.id %}" class="btn btn-secondary btn-sm" style="font-size: 0.82rem; padding: 0.35rem 0.85rem;">
+                Inspect Dossier &rarr;
+              </a>
+              <div style="display: flex; gap: 0.35rem;">
+                <a href="{% url 'document_edit' doc.id %}" class="btn btn-secondary btn-sm" title="Edit" style="padding: 0.35rem 0.65rem;">
+                  Edit
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Dynamic Search Client-Side Empty Notice (Hidden by default) -->
+<div id="searchEmptyNotice" style="display: none; padding: 2.5rem; text-align: center; background: var(--c-white); border: 1px solid var(--c-border); border-radius: var(--radius-md); margin-top: 1rem;">
+  <p style="color: var(--c-charcoal-muted); font-size: 0.95rem;">No documents match your realtime search keyword.</p>
+</div>
+
+<!-- ==========================================================================
+     BESPOKE EDITORIAL DELETION MODAL
+     ========================================================================== -->
+<div id="editorialDeleteModal" class="editorial-modal-backdrop">
+  <div class="editorial-modal-card">
+    <div style="width: 48px; height: 48px; border-radius: 50%; background: #FDE8E8; color: #B93838; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    </div>
+    <h3 style="font-family: var(--font-serif); font-size: 1.4rem; color: var(--c-forest-dark); margin-bottom: 0.5rem;">
+      Delete Document Record?
+    </h3>
+    <p style="font-size: 0.92rem; color: var(--c-charcoal-muted); line-height: 1.6; margin-bottom: 1.5rem;">
+      Are you sure you want to permanently remove <strong id="deleteTargetTitle" style="color: var(--c-forest-dark);">this document</strong> from your vault? This will erase associated chronometry and archival metadata.
+    </p>
+
+    <div style="display: flex; justify-content: flex-end; gap: 0.85rem;">
+      <button type="button" id="cancelDeleteBtn" class="btn btn-secondary btn-sm">
+        Cancel
+      </button>
+      <button type="button" id="confirmDeleteBtn" class="btn btn-sm" style="background: #B93838; color: #FFF; border-color: #B93838;">
+        Confirm Permanent Deletion
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Table / Grid Switcher
+  const tableBtn = document.getElementById('toggleTableViewBtn');
+  const gridBtn = document.getElementById('toggleGridViewBtn');
+  const tableContainer = document.getElementById('tableViewContainer');
+  const gridContainer = document.getElementById('gridViewContainer');
+
+  if (tableBtn && gridBtn && tableContainer && gridContainer) {
+    gridBtn.addEventListener('click', () => {
+      tableContainer.style.display = 'none';
+      gridContainer.style.display = 'block';
+      gridBtn.style.background = 'var(--c-white)';
+      gridBtn.style.color = 'var(--c-charcoal)';
+      gridBtn.style.borderColor = 'var(--c-border)';
+      gridBtn.style.boxShadow = 'var(--shadow-subtle)';
+      tableBtn.style.background = 'transparent';
+      tableBtn.style.color = 'var(--c-charcoal-muted)';
+      tableBtn.style.borderColor = 'transparent';
+      tableBtn.style.boxShadow = 'none';
+    });
+
+    tableBtn.addEventListener('click', () => {
+      gridContainer.style.display = 'none';
+      tableContainer.style.display = 'block';
+      tableBtn.style.background = 'var(--c-white)';
+      tableBtn.style.color = 'var(--c-charcoal)';
+      tableBtn.style.borderColor = 'var(--c-border)';
+      tableBtn.style.boxShadow = 'var(--shadow-subtle)';
+      gridBtn.style.background = 'transparent';
+      gridBtn.style.color = 'var(--c-charcoal-muted)';
+      gridBtn.style.borderColor = 'transparent';
+      gridBtn.style.boxShadow = 'none';
+    });
+  }
+</script>
+{% endblock %}

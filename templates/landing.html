@@ -1,0 +1,920 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}DocumentDock — Important things shouldn't slip through the cracks{% endblock %}
+
+{% block content %}
+<!-- ==========================================================================
+     A. EDITORIAL NAVIGATION
+     ========================================================================== -->
+<header class="site-nav">
+  <div class="container-wide nav-container">
+    <a href="{% url 'landing' %}" class="brand-logo" aria-label="DocumentDock Home">
+      <div class="brand-icon-wrap">
+        <!-- Custom Stylized Document Vault Mark -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+      </div>
+      <div class="brand-logo-text">
+        Document<span>Dock</span><span class="period">.</span>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      <a href="#problem" class="nav-link">The Reality</a>
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#dashboard-preview" class="nav-link">Interface</a>
+      <a href="#security" class="nav-link">Security & Privacy</a>
+    </nav>
+
+    <div class="nav-actions">
+      {% if is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-sm">
+          <span>Go to Vault</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      {% else %}
+        <a href="{% url 'demo_login' %}" class="btn btn-secondary btn-sm" title="Instant access without registration">
+          <span>Explore Demo</span>
+        </a>
+        <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">Sign In</a>
+        <a href="{% url 'register' %}" class="btn btn-primary btn-sm">
+          <span>Get Started</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      {% endif %}
+
+      <button class="nav-toggle-btn" aria-label="Toggle navigation menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Navigation Drawer -->
+<div class="mobile-nav-drawer">
+  <a href="#problem" class="nav-link">The Reality</a>
+  <a href="#how-it-works" class="nav-link">How It Works</a>
+  <a href="#features" class="nav-link">Features</a>
+  <a href="#dashboard-preview" class="nav-link">Interface</a>
+  <a href="#security" class="nav-link">Security & Privacy</a>
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+    {% if is_authenticated %}
+      <a href="{% url 'dashboard' %}" class="btn btn-primary">Go to Vault</a>
+    {% else %}
+      <a href="{% url 'demo_login' %}" class="btn btn-secondary">Explore Live Demo</a>
+      <a href="{% url 'login' %}" class="btn btn-secondary">Sign In</a>
+      <a href="{% url 'register' %}" class="btn btn-primary">Get Started</a>
+    {% endif %}
+  </div>
+</div>
+
+<main>
+  <!-- ==========================================================================
+       B. ASYMMETRICAL HERO SECTION
+       ========================================================================== -->
+  <section class="hero-section">
+    <div class="container-wide">
+      <div class="hero-grid">
+        <!-- Left Editorial Copy -->
+        <div class="hero-copy gsap-fade-up">
+          <div class="editorial-tag">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Editorial Expiry Intelligence</span>
+          </div>
+
+          <h1 class="hero-headline">
+            Important things shouldn't <span class="highlight-word">slip through the cracks.</span>
+          </h1>
+
+          <p class="hero-subtext">
+            One organized space for your documents, deadlines, and renewals. Stay ahead without keeping everything in your head.
+          </p>
+
+          <div class="hero-actions">
+            {% if is_authenticated %}
+              <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">
+                <span>Enter Your Vault</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            {% else %}
+              <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+                <span>Open Your Private Vault</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+              <a href="{% url 'demo_login' %}" class="btn btn-secondary btn-lg">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Live Interactive Demo</span>
+              </a>
+            {% endif %}
+          </div>
+
+          <!-- Editorial Stats Strip -->
+          <div class="hero-stats-row">
+            <div class="hero-stat-item">
+              <span class="hero-stat-value counter-anim" data-target="99.8" data-decimal="true" data-suffix="%">0%</span>
+              <span class="hero-stat-label">Renewals on schedule</span>
+            </div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-value counter-anim" data-target="0" data-suffix=" missed">0</span>
+              <span class="hero-stat-label">Regulatory penalties</span>
+            </div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-value">AES-256</span>
+              <span class="hero-stat-label">Isolated vault security</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Visual Composition with Editorial Imagery & Expiry Badges -->
+        <div class="hero-media-wrapper gsap-fade-up">
+          <div class="hero-secondary-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Auto Cover Renewed — 0 Gaps</span>
+          </div>
+
+          <div class="hero-photo-frame">
+            <img src="{% static 'images/hero-documents.jpg' %}" alt="Organized desk with passport, notebooks, and archival documents" loading="eager" width="1200" height="900">
+          </div>
+
+          <!-- Floating Integrated Expiry Preview Card -->
+          <div class="hero-floating-card">
+            <div class="floating-card-header">
+              <div>
+                <div class="floating-card-title">British Biometric Passport</div>
+                <div class="floating-card-sub">GBR-88429104 &bull; Travel Document</div>
+              </div>
+              <span class="status-pill status-warning">Urgent</span>
+            </div>
+            <div class="floating-card-body">
+              <div>
+                <span class="floating-card-days">42 Days</span>
+                <span style="font-size: 0.8rem; color: var(--c-charcoal-subtle); display: block;">Until 6-month validity cut-off</span>
+              </div>
+              <div style="text-align: right;">
+                <span class="editorial-tag terracotta" style="font-size: 0.72rem;">Action Window Open</span>
+              </div>
+            </div>
+            <div class="floating-meter">
+              <div class="floating-meter-bar" style="width: 28%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       C. PROBLEM SECTION: "Small deadlines. Big consequences."
+       ========================================================================== -->
+  <section class="problem-section" id="problem">
+    <div class="container">
+      <div class="problem-header gsap-fade-up">
+        <div class="section-label">
+          <span class="section-number">01</span>
+          <div class="section-title-line"></div>
+          <span class="editorial-tag terracotta">The Blind Spot</span>
+        </div>
+        <h2>Small deadlines.<br><span class="italic">Big consequences.</span></h2>
+        <p>
+          Important documents don’t knock before they expire. They slip quietly past their renewal thresholds while life moves forward—until an airline agent turns you away, a policy lapses during an emergency, or an unexpected fine arrives.
+        </p>
+      </div>
+
+      <div class="problem-editorial-grid gsap-stagger-group">
+        <!-- Story 01 -->
+        <article class="editorial-story-card">
+          <div>
+            <div class="story-marker">SCENARIO // 01</div>
+            <h3 class="story-title">The Grounded Flight</h3>
+            <p class="story-body">
+              You booked flights months ago. At the check-in desk, the agent informs you that while your passport expires in 4 months, your destination mandates 6 months of remaining validity. The trip is forfeited.
+            </p>
+          </div>
+          <div class="story-outcome">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Result: Lost airfare & emergency expedited fees</span>
+          </div>
+        </article>
+
+        <!-- Story 02 -->
+        <article class="editorial-story-card">
+          <div>
+            <div class="story-marker">SCENARIO // 02</div>
+            <h3 class="story-title">The Lapsed Policy</h3>
+            <p class="story-body">
+              A routine vehicle insurance auto-renewal failed due to an expired debit card on file. A week later, a minor parking dent reveals you’ve been driving uninsured, triggering points and steep retrospective fees.
+            </p>
+          </div>
+          <div class="story-outcome">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Result: Uninsured liability & compounding penalties</span>
+          </div>
+        </article>
+
+        <!-- Story 03 -->
+        <article class="editorial-story-card">
+          <div>
+            <div class="story-marker">SCENARIO // 03</div>
+            <h3 class="story-title">The Tenancy Lock-In</h3>
+            <p class="story-body">
+              Your rental contract had a 60-day break clause notice period. You remembered on day 52. The landlord automatically extends the lease for an entire additional calendar year against your moving plans.
+            </p>
+          </div>
+          <div class="story-outcome">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Result: Unwanted 12-month legal lease commitment</span>
+          </div>
+        </article>
+      </div>
+
+      <!-- Impact Quote Banner -->
+      <div class="problem-impact-banner gsap-fade-up">
+        <div class="impact-text">
+          <h3>“The average household loses \$1,480 and 34 hours every decade to preventable document lapses.”</h3>
+          <p>DocumentDock was engineered as an antidote to bureaucratic friction.</p>
+        </div>
+        <a href="{% url 'register' %}" class="btn btn-terracotta" style="flex-shrink: 0;">Protect Your Papers</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       D. HOW IT WORKS (EDITORIAL TIMELINE)
+       ========================================================================== -->
+  <section class="timeline-section" id="how-it-works">
+    <div class="container">
+      <div class="timeline-header gsap-fade-up">
+        <div class="section-label" style="justify-content: center;">
+          <span class="section-number">02</span>
+          <div class="section-title-line"></div>
+          <span class="editorial-tag">The Protocol</span>
+        </div>
+        <h2>A deliberate, quiet system for document mastery.</h2>
+        <p>No noisy daily pings. No cluttered calendars. Just three clear steps that keep your essential records in pristine order.</p>
+      </div>
+
+      <div class="timeline-editorial-flow gsap-stagger-group">
+        <!-- Step 1 -->
+        <div class="timeline-step">
+          <div class="timeline-step-badge">1</div>
+          <h3 class="timeline-step-title">Add your documents</h3>
+          <p class="timeline-step-desc">
+            Deposit digital scans, smartphone snaps, or policy numbers. Categorize into Travel, Vehicles, Health, Property, or Professional in seconds.
+          </p>
+          <div class="timeline-step-meta">
+            <span>INPUT: PDF, JPEG, PNG or Reference ID</span>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="timeline-step">
+          <div class="timeline-step-badge">2</div>
+          <h3 class="timeline-step-title">Track expiry dates</h3>
+          <p class="timeline-step-desc">
+            Our engine calculates statutory notice periods and remaining valid days. Documents are visually prioritized by urgency and renewal difficulty.
+          </p>
+          <div class="timeline-step-meta">
+            <span>CALCULATION: 90 / 60 / 30-day radar</span>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="timeline-step">
+          <div class="timeline-step-badge">3</div>
+          <h3 class="timeline-step-title">Renew before deadlines</h3>
+          <p class="timeline-step-desc">
+            Receive calm, actionable briefs with issuing authority links and required paperwork checklists before your document enters the danger zone.
+          </p>
+          <div class="timeline-step-meta">
+            <span>EXECUTION: Zero friction renewal checklists</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       E. FEATURE SHOWCASE (ALTERNATING EDITORIAL SPREADS)
+       ========================================================================== -->
+  <section class="features-section" id="features">
+    <div class="container">
+      
+      <!-- Feature 01: Vault Organization -->
+      <div class="feature-spread gsap-fade-up">
+        <div class="feature-copy">
+          <div class="section-label">
+            <span class="section-number">03.1</span>
+            <div class="section-title-line"></div>
+            <span class="editorial-tag">Structure</span>
+          </div>
+          <h2 class="feature-heading">An archival vault built for real life.</h2>
+          <p class="feature-lead">
+            Traditional file trees are chaotic. DocumentDock structures your records around life sectors, keeping your critical identification, assets, and credentials immediately retrievable.
+          </p>
+          <ul class="feature-points">
+            <li class="feature-point-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Pre-configured for Travel, Vehicles, Health, Housing, and Degrees.</span>
+            </li>
+            <li class="feature-point-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Instant search across document numbers, notes, and issuing bodies.</span>
+            </li>
+            <li class="feature-point-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Permanent / Lifetime support for birth certificates and diplomas.</span>
+            </li>
+          </ul>
+
+          <div class="category-pills-spread">
+            <span class="category-pill">&bull; Identity & Travel</span>
+            <span class="category-pill">&bull; Vehicles & Transport</span>
+            <span class="category-pill">&bull; Insurance & Health</span>
+            <span class="category-pill">&bull; Property & Housing</span>
+            <span class="category-pill">&bull; Professional & Work</span>
+          </div>
+        </div>
+
+        <div class="feature-visual">
+          <div class="feature-visual-photo">
+            <img src="{% static 'images/editorial-paperwork.jpg' %}" alt="Organized files and paper certificates" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 02: Automatic Expiry Tracking (Reversed) -->
+      <div class="feature-spread reverse gsap-fade-up">
+        <div class="feature-copy">
+          <div class="section-label">
+            <span class="section-number">03.2</span>
+            <div class="section-title-line"></div>
+            <span class="editorial-tag terracotta">Chronometry</span>
+          </div>
+          <h2 class="feature-heading">Proactive expiry radar. Not reactive panic.</h2>
+          <p class="feature-lead">
+            A deadline is only useful if you know about it with sufficient time to act. Passports take 4 to 8 weeks to renew; vehicle checks require booking windows. DocumentDock factors lead times into every calculation.
+          </p>
+          <ul class="feature-points">
+            <li class="feature-point-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Color-coded status indicators: Valid, Expiring Soon, Expired, and Lifetime.</span>
+            </li>
+            <li class="feature-point-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Customizable notice periods (e.g. 60 days for visas, 30 days for MOT).</span>
+            </li>
+            <li class="feature-point-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Chronological upcoming timeline preview right on your dashboard.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="feature-visual">
+          <div class="feature-visual-photo">
+            <img src="{% static 'images/passport-travel.jpg' %}" alt="Passport and travel documentation flatlay" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 03: Renewal Guidance & File Safety -->
+      <div class="feature-spread gsap-fade-up">
+        <div class="feature-copy">
+          <div class="section-label">
+            <span class="section-number">03.3</span>
+            <div class="section-title-line"></div>
+            <span class="editorial-tag">Clarity</span>
+          </div>
+          <h2 class="feature-heading">Everything needed to renew in one place.</h2>
+          <p class="feature-lead">
+            When it’s time to renew, you don’t have to dig through filing cabinets. Your old document reference number, issuing authority, and specific renewal steps are immediately displayed side-by-side.
+          </p>
+          <ul class="feature-points">
+            <li class="feature-point-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Integrated file preview for high-resolution inspection.</span>
+            </li>
+            <li class="feature-point-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Notes section for tracking safe deposit locker numbers and policy links.</span>
+            </li>
+            <li class="feature-point-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>One-click document updates with automatic recalculation of next cycle.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="feature-visual">
+          <div class="feature-visual-photo">
+            <img src="{% static 'images/editorial-desk.jpg' %}" alt="Refined workspace with stationery and brass details" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       F. DASHBOARD PREVIEW (REALISTIC SCREENSHOT-LIKE INTERFACE)
+       ========================================================================== -->
+  <section class="preview-section" id="dashboard-preview">
+    <div class="container-wide">
+      <div class="preview-header gsap-fade-up">
+        <div class="section-label" style="justify-content: center;">
+          <span class="section-number">04</span>
+          <div class="section-title-line"></div>
+          <span class="editorial-tag">The Workstation</span>
+        </div>
+        <h2>Designed with editorial restraint.</h2>
+        <p>A calm, high-contrast interface with warm ivory canvas, forest green accents, and subtle typography. Real software for people who value elegance.</p>
+      </div>
+
+      <!-- High-fidelity Browser Window Mockup -->
+      <div class="app-window-frame gsap-fade-up">
+        <div class="window-titlebar">
+          <div class="window-dots">
+            <span class="window-dot red"></span>
+            <span class="window-dot yellow"></span>
+            <span class="window-dot green"></span>
+          </div>
+          <div class="window-url-bar">https://app.documentdock.io/vault/overview</div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--c-forest); font-weight: 500;">
+            ● MONGO LIVE
+          </div>
+        </div>
+
+        <div class="preview-inner-canvas">
+          <!-- Mini Stats Grid Inside Preview -->
+          <div class="mini-stats-grid">
+            <div class="mini-stat-card">
+              <div class="lbl">Total Documents</div>
+              <div class="val">7</div>
+            </div>
+            <div class="mini-stat-card">
+              <div class="lbl">Active & Valid</div>
+              <div class="val" style="color: var(--c-forest);">4</div>
+            </div>
+            <div class="mini-stat-card">
+              <div class="lbl">Expiring Soon</div>
+              <div class="val" style="color: var(--c-terracotta);">2</div>
+            </div>
+            <div class="mini-stat-card">
+              <div class="lbl">Action Required</div>
+              <div class="val" style="color: #B93838;">1</div>
+            </div>
+          </div>
+
+          <!-- Interactive Filter Tabs for Landing Mockup -->
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+            <button class="filter-tab preview-tab-btn active" data-filter="all">All Records (4)</button>
+            <button class="filter-tab preview-tab-btn" data-filter="Expiring Soon">Expiring Soon (2)</button>
+            <button class="filter-tab preview-tab-btn" data-filter="Active">Active (2)</button>
+            <button class="filter-tab preview-tab-btn" data-filter="Identity & Travel">Travel & ID</button>
+          </div>
+
+          <!-- Realistic Mini Table -->
+          <div class="mini-table-preview">
+            <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--c-border); display: flex; justify-content: space-between; align-items: center; background: var(--c-ivory-light);">
+              <span style="font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--c-forest-dark);">Critical Timeline Ahead</span>
+              <span class="editorial-tag" style="font-size: 0.7rem;">Realtime Ledger</span>
+            </div>
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>DOCUMENT TITLE</th>
+                    <th>CATEGORY</th>
+                    <th>REFERENCE</th>
+                    <th>EXPIRY TIMELINE</th>
+                    <th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in sample_items %}
+                    <tr class="preview-mock-row" data-category="{{ item.category }}" data-status="{{ item.status }}">
+                      <td>
+                        <strong class="table-doc-title">{{ item.title }}</strong>
+                      </td>
+                      <td>
+                        <span class="category-pill" style="font-size: 0.75rem;">{{ item.category }}</span>
+                      </td>
+                      <td>
+                        <span class="table-doc-number">{{ item.number }}</span>
+                      </td>
+                      <td>
+                        <span style="font-weight: 600; color: {% if item.days <= 45 %}var(--c-terracotta){% else %}var(--c-forest){% endif %};">
+                          {{ item.expiry_human }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="status-pill {{ item.urgency_class }}">{{ item.status }}</span>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url 'demo_login' %}" class="btn btn-secondary">
+          <span>Test the Live Application Dashboard Now</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <!-- ==========================================================================
+           INTERACTIVE EXPIRY SIMULATOR WIDGET
+           ========================================================================== -->
+      <div class="simulator-card gsap-fade-up">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div class="editorial-tag terracotta" style="margin-bottom: 0.4rem;">Interactive Laboratory</div>
+            <h3 style="font-size: 1.65rem; font-weight: 500; color: var(--c-forest-dark);">Test Your Document Risk Exposure</h3>
+            <p style="font-size: 0.95rem; color: var(--c-charcoal-muted); margin-top: 0.2rem;">
+              Simulate statutory validity cutoffs and see how DocumentDock protects your plans.
+            </p>
+          </div>
+          <span style="font-family: var(--font-mono); font-size: 0.76rem; color: var(--c-charcoal-subtle);">REAL-TIME ALGORITHM</span>
+        </div>
+
+        <div class="simulator-controls">
+          <div>
+            <label class="form-label" for="simDocType">Select Document Archetype</label>
+            <select id="simDocType" class="form-select">
+              <option value="passport">Biometric Passport (6-Month Global Travel Rule)</option>
+              <option value="insurance">Comprehensive Auto Insurance (Direct Debit Rollover)</option>
+              <option value="tenancy">Residential Lease (60-Day Fixed Break Clause)</option>
+            </select>
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+              <label class="form-label" style="margin-bottom: 0;" for="simMonthsRemaining">Months Remaining</label>
+              <span id="simMonthsVal" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; color: var(--c-terracotta);">5 months</span>
+            </div>
+            <input type="range" id="simMonthsRemaining" min="1" max="24" value="5" style="width: 100%; accent-color: var(--c-terracotta); cursor: pointer;">
+          </div>
+
+          <div>
+            <button type="button" class="btn btn-subtle" onclick="document.getElementById('simMonthsRemaining').value = 4; document.getElementById('simMonthsRemaining').dispatchEvent(new Event('input'));" style="padding: 0.72rem 1.2rem;">
+              Simulate 4 Mo.
+            </button>
+          </div>
+        </div>
+
+        <div id="simOutputBox" class="simulator-result-box">
+          <div style="max-width: 580px;">
+            <div style="margin-bottom: 0.5rem;">
+              <span id="simStatusBadge" class="status-pill status-expired">CRITICAL TRAVEL RESTRICTION</span>
+            </div>
+            <h4 id="simHeadline" style="font-size: 1.2rem; color: var(--c-forest-dark); margin-bottom: 0.35rem;">
+              High Risk: 5 Months Remaining
+            </h4>
+            <p id="simAdvice" style="font-size: 0.92rem; color: var(--c-charcoal-muted); line-height: 1.55; margin: 0;">
+              Over 70 international jurisdictions enforce a mandatory 6-month validity threshold. You are likely ineligible to board international flights.
+            </p>
+          </div>
+
+          <a href="{% url 'register' %}" class="btn btn-primary btn-sm">
+            <span>Prevent This in Vault</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       EDITORIAL TESTIMONIALS & USER EXPERIENCES
+       ========================================================================== -->
+  <section class="testimonials-section">
+    <div class="container">
+      <div class="section-label" style="justify-content: center;">
+        <span class="section-number">05</span>
+        <div class="section-title-line"></div>
+        <span class="editorial-tag">Voices of Order</span>
+      </div>
+      <div style="text-align: center; max-width: 650px; margin: 0 auto;">
+        <h2>Trusted by meticulous individuals, founders, and global families.</h2>
+      </div>
+
+      <div class="testimonials-grid gsap-stagger-group">
+        <!-- Testimonial 1 -->
+        <article class="testimonial-card">
+          <div class="quote-glyph">“</div>
+          <p class="testimonial-body">
+            “I used to keep renewal dates on calendar reminders that I inevitably silenced and forgot. DocumentDock’s quiet chronometer warned me 60 days before my passport invalidated my Tokyo trip.”
+          </p>
+          <div class="testimonial-author-row">
+            <img src="{% static 'images/profile-portrait.jpg' %}" alt="Portrait of Julian Sterling" class="author-avatar-img">
+            <div class="author-meta">
+              <h5>Julian Sterling</h5>
+              <span>Archival Architect & Founder</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Testimonial 2 -->
+        <article class="testimonial-card">
+          <div class="quote-glyph">“</div>
+          <p class="testimonial-body">
+            “Managing health policies for four family members across two countries was an anxiety-inducing chore. Having an editorial ledger with exact notice windows has completely removed that cognitive weight.”
+          </p>
+          <div class="testimonial-author-row">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--c-forest); color: var(--c-ivory); display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600;">
+              CB
+            </div>
+            <div class="author-meta">
+              <h5>Clara Beauchamp</h5>
+              <span>International Policy Director</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Testimonial 3 -->
+        <article class="testimonial-card">
+          <div class="quote-glyph">“</div>
+          <p class="testimonial-body">
+            “The interface looks like an independent European monograph, not another SaaS template. It respects my intelligence and my time. It’s what software should feel like in 2026.”
+          </p>
+          <div class="testimonial-author-row">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--c-terracotta); color: #FFF; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600;">
+              ML
+            </div>
+            <div class="author-meta">
+              <h5>Marcus Lindqvist</h5>
+              <span>Nordic Property Portfolio Lead</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       INTERACTIVE FAQ ACCORDION
+       ========================================================================== -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      <div class="faq-header gsap-fade-up">
+        <div class="section-label" style="justify-content: center;">
+          <span class="section-number">06</span>
+          <div class="section-title-line"></div>
+          <span class="editorial-tag">Inquiries</span>
+        </div>
+        <h2>Frequently Addressed Questions</h2>
+        <p>Everything you need to understand how DocumentDock safeguards your archival records.</p>
+      </div>
+
+      <div class="faq-list">
+        <!-- Q1 -->
+        <div class="faq-item open">
+          <button class="faq-question-btn" type="button">
+            <span>How does DocumentDock determine statutory renewal windows?</span>
+            <div class="faq-icon-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">
+            DocumentDock incorporates international border regulations (such as the Schengen 6-month passport rule) and contract norms (such as UK/US 60-day residential tenancy break clauses) into its default calculation. You can also customize your own advance warning thresholds per document.
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="faq-item">
+          <button class="faq-question-btn" type="button">
+            <span>What happens with permanent documents that never expire?</span>
+            <div class="faq-icon-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">
+            When archiving records such as birth certificates, academic degrees, or physical deed registries, simply leave the expiration date blank. DocumentDock classifies them with a permanent "Lifetime" status and keeps them indexed for rapid retrieval without any countdown pressure.
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="faq-item">
+          <button class="faq-question-btn" type="button">
+            <span>How are files stored and protected in MongoDB?</span>
+            <div class="faq-icon-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">
+            Every document record is stored in isolated MongoDB documents tagged strictly with your unique account identifier. Access controls enforce that only an authenticated session matching that user ID can view, edit, or download the attached assets.
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="faq-item">
+          <button class="faq-question-btn" type="button">
+            <span>Can I test the full application without creating an account?</span>
+            <div class="faq-icon-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">
+            Yes! Click "Explore Demo" or "Launch Interactive Demo Vault" anywhere on the site. You will be instantly authenticated as Eleanor Vance into a pre-populated vault featuring realistic biometric passports, auto policies, and lease agreements.
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="faq-item">
+          <button class="faq-question-btn" type="button">
+            <span>Can DocumentDock be self-hosted locally?</span>
+            <div class="faq-icon-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">
+            DocumentDock is built on standard Python 3, Django, and PyMongo. It can be run locally on macOS, Linux, or Windows with a single `python manage.py runserver` command. It includes a built-in JSON fallback mechanism so it operates seamlessly even when offline.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       G. PRIVACY & SECURITY SECTION
+       ========================================================================== -->
+  <section class="security-section" id="security">
+    <div class="container">
+      <div class="security-grid">
+        <div class="security-copy gsap-fade-up">
+          <div class="section-label">
+            <span class="section-number" style="color: var(--c-sage);">05</span>
+            <div class="section-title-line" style="background-color: rgba(255,255,255,0.2);"></div>
+            <span class="editorial-tag" style="background: rgba(255,255,255,0.1); color: var(--c-ivory); border-color: rgba(255,255,255,0.2);">Sovereign Trust</span>
+          </div>
+          <h2>Your papers are your business. Period.</h2>
+          <p>
+            Your identity documents, vehicle leases, and health cards contain sensitive life information. DocumentDock operates on strict zero-surveillance principles.
+          </p>
+
+          <div class="security-pillars">
+            <div class="security-pillar-box">
+              <h4>Isolated Collections</h4>
+              <p>Each user's records in MongoDB are isolated by unique cryptographic user identifiers. Cross-tenant leakage is architecturally prohibited.</p>
+            </div>
+            <div class="security-pillar-box">
+              <h4>No Ad Data Mining</h4>
+              <p>We do not train models on your uploaded files, sell contact metadata to third parties, or run invasive trackers.</p>
+            </div>
+            <div class="security-pillar-box">
+              <h4>Owner-Only Access</h4>
+              <p>Uploaded scans are served strictly through authenticated sessions. Direct public file browsing is barred.</p>
+            </div>
+            <div class="security-pillar-box">
+              <h4>Export Anytime</h4>
+              <p>You own your records. Export your metadata and documents cleanly whenever you choose.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="security-graphic-box gsap-fade-up">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 48px; height: 48px; border-radius: 6px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--c-sage);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <div>
+              <h3 style="color: #FFFFFF; font-size: 1.25rem;">Cryptographic Vault Assurance</h3>
+              <p style="color: var(--c-sage); font-size: 0.86rem; margin: 0;">Architected with Python & MongoDB Security Practices</p>
+            </div>
+          </div>
+
+          <div class="crypto-indicator">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38A169;"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>SHA-256 Session Token Validation</span>
+          </div>
+          <div class="crypto-indicator">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38A169;"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Role-Based Tenant Access Partitioning</span>
+          </div>
+          <div class="crypto-indicator">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #38A169;"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Zero Unauthenticated Document Exposures</span>
+          </div>
+
+          <div style="padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.82rem; color: var(--c-sage);">
+            Tested against OWASP Top 10 guidelines for web application integrity.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       H. FINAL CTA SECTION
+       ========================================================================== -->
+  <section class="final-cta-section">
+    <div class="container">
+      <div class="cta-box gsap-fade-up">
+        <div class="editorial-tag terracotta" style="margin-bottom: 1.25rem;">Instant Deployment</div>
+        <h2>Get ahead of every expiry.</h2>
+        <p>
+          Take control of your passports, vehicle paperwork, leases, and policies. It takes under two minutes to catalog your first document.
+        </p>
+
+        <div class="cta-actions">
+          {% if is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">
+              <span>Go to Your Vault</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          {% else %}
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+              <span>Create Free Vault Account</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="{% url 'demo_login' %}" class="btn btn-secondary btn-lg">
+              <span>Launch Demo Vault Instantly</span>
+            </a>
+          {% endif %}
+        </div>
+
+        <div class="trust-badges-row">
+          <span>&bull; No credit card required</span>
+          <span>&bull; Self-hosted or Cloud-ready</span>
+          <span>&bull; Full MongoDB document persistence</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ==========================================================================
+     I. FOOTER
+     ========================================================================== -->
+<footer class="site-footer">
+  <div class="container-wide">
+    <div class="footer-top">
+      <div class="footer-brand-col">
+        <a href="{% url 'landing' %}" class="brand-logo">
+          <div class="brand-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          </div>
+          <div class="brand-logo-text">Document<span>Dock</span><span class="period">.</span></div>
+        </a>
+        <p>
+          An editorial document repository and proactive expiry intelligence platform. Built with Django, PyMongo, and modern visual craftsmanship.
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="#problem">The Reality</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#features">Feature Showcase</a></li>
+          <li><a href="#dashboard-preview">Interface Preview</a></li>
+          <li><a href="{% url 'demo_login' %}">Interactive Demo</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Categories</h5>
+        <ul>
+          <li><a href="#features">Identity & Travel</a></li>
+          <li><a href="#features">Vehicles & Transport</a></li>
+          <li><a href="#features">Insurance & Health</a></li>
+          <li><a href="#features">Property & Housing</a></li>
+          <li><a href="#features">Professional & Work</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Architecture</h5>
+        <ul>
+          <li><a href="#">Python 3 & Django 6</a></li>
+          <li><a href="#">MongoDB Document Store</a></li>
+          <li><a href="#">Editorial Design System</a></li>
+          <li><a href="#">Zero Third-Party Trackers</a></li>
+          <li><a href="{% url 'login' %}">Vault Access Portal</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>
+        &copy; 2026 DocumentDock. Designed & developed with editorial precision.
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 0.78rem;">
+        Django Project &bull; MongoDB Architecture &bull; College Capstone Portfolio
+      </div>
+    </div>
+  </div>
+</footer>
+{% endblock %}
+

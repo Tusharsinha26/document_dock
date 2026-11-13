@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Private Vault — DocumentDock{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <!-- Left Editorial Hero Pane -->
+  <div class="auth-hero-pane">
+    <a href="{% url 'landing' %}" class="brand-logo" style="color: var(--c-ivory);">
+      <div class="brand-icon-wrap" style="background: var(--c-ivory); color: var(--c-forest);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+      </div>
+      <div class="brand-logo-text" style="color: var(--c-ivory);">Document<span style="color: var(--c-sage);">Dock</span><span class="period" style="color: var(--c-terracotta);">.</span></div>
+    </a>
+
+    <div style="position: relative; z-index: 2; margin: 4rem 0;">
+      <div class="editorial-tag" style="background: rgba(255,255,255,0.12); color: var(--c-ivory); border-color: rgba(255,255,255,0.2); margin-bottom: 1.5rem;">
+        Archival Onboarding
+      </div>
+      <h1 style="color: var(--c-ivory); font-size: clamp(2rem, 3.5vw, 3rem); line-height: 1.15; margin-bottom: 1.25rem;">
+        Never be caught off-guard by a bureaucratic cutoff.
+      </h1>
+      <p style="color: var(--c-sage); font-size: 1.05rem; line-height: 1.6; max-width: 480px;">
+        Register your private partition. We calculate deadlines, statutory lead times, and alert you with quiet discretion.
+      </p>
+    </div>
+
+    <div style="position: relative; z-index: 2; font-family: var(--font-mono); font-size: 0.76rem; color: var(--c-sage-dark);">
+      Zero advertising tracking &bull; Isolated MongoDB tenant storage
+    </div>
+  </div>
+
+  <!-- Right Form Pane -->
+  <div class="auth-form-pane">
+    <div class="auth-box">
+      <div style="margin-bottom: 1.75rem;">
+        <h2 style="font-size: 1.9rem; font-weight: 500; color: var(--c-forest-dark); margin-bottom: 0.5rem;">
+          Create your private vault
+        </h2>
+        <p style="font-size: 0.95rem; color: var(--c-charcoal-muted);">
+          Set up your secure profile to catalog documents and monitor expiry dates.
+        </p>
+      </div>
+
+      {% if form.errors %}
+        <div style="background: #FDF2F2; border: 1px solid #F8B4B4; border-radius: 4px; padding: 0.85rem 1rem; margin-bottom: 1.25rem; color: #9B1C1C; font-size: 0.88rem;">
+          <strong>Please address the following:</strong>
+          <ul style="margin-top: 0.35rem; margin-left: 1.25rem;">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="POST" action="{% url 'register' %}">
+        {% csrf_token %}
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.first_name.id_for_label }}">First Name</label>
+            {{ form.first_name }}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.last_name.id_for_label }}">Last Name</label>
+            {{ form.last_name }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.username.id_for_label }}">Choose Username</label>
+          {{ form.username }}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.email.id_for_label }}">Email Address</label>
+          {{ form.email }}
+          <span class="form-help">Used strictly for renewal reminders and vault communications</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.password.id_for_label }}">Vault Password</label>
+          {{ form.password }}
+        </div>
+
+        <div style="background: var(--c-forest-tint); border: 1px solid rgba(24, 61, 50, 0.15); padding: 0.85rem 1rem; border-radius: 4px; margin-bottom: 1.5rem; font-size: 0.82rem; color: var(--c-forest-dark); line-height: 1.45;">
+          <strong>Starter Archive Provisioning:</strong> We will automatically pre-populate your vault with realistic starter documents so you can immediately see the timeline and analytics in action.
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+          <span>Open My Private Vault</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </form>
+
+      <div style="margin-top: 1.75rem; text-align: center; font-size: 0.92rem; color: var(--c-charcoal-muted);">
+        Already registered?
+        <a href="{% url 'login' %}" style="font-weight: 600; color: var(--c-forest); text-decoration: underline;">
+          Sign in here
+        </a>
+        &bull;
+        <a href="{% url 'demo_login' %}" style="font-weight: 600; color: var(--c-terracotta); text-decoration: underline;">
+          Try instant demo
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

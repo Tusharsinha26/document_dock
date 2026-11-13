@@ -1,0 +1,267 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}{{ doc.title }} — DocumentDock{% endblock %}
+{% block page_title %}Document Details{% endblock %}
+
+{% block app_content %}
+<!-- Top Navigation Breadcrumbs & Actions -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;">
+  <a href="{% url 'documents_list' %}" class="btn btn-secondary btn-sm" style="gap: 0.4rem;">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <span>Back to Repository</span>
+  </a>
+
+  <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+    {% if doc.days_remaining is not None %}
+      <form method="POST" action="{% url 'document_renew' doc.id %}" style="display: inline;">
+        {% csrf_token %}
+        <input type="hidden" name="years" value="1">
+        <button type="submit" class="btn btn-primary btn-sm" title="Quick renew: Extend expiry by 1 calendar year">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <span>Renew (+1 Year)</span>
+        </button>
+      </form>
+    {% endif %}
+    <a href="{% url 'document_edit' doc.id %}" class="btn btn-secondary btn-sm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+      <span>Edit Record</span>
+    </a>
+    <form method="POST" action="{% url 'document_delete' doc.id %}" style="display: inline;">
+      {% csrf_token %}
+      <button type="button" class="btn btn-secondary btn-sm btn-confirm-delete" data-title="{{ doc.title }}" style="color: #B93838;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <span>Delete</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     PROMINENT EXPIRY COUNTDOWN BANNER
+     ========================================================================== -->
+<div class="detail-banner {% if doc.status == 'Expiring Soon' %}warning{% elif doc.status == 'Expired' %}expired{% else %}active{% endif %}">
+  <div style="display: flex; align-items: center; gap: 1.25rem;">
+    <div style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: {% if doc.status == 'Expiring Soon' %}var(--c-terracotta){% elif doc.status == 'Expired' %}#B93838{% else %}var(--c-forest){% endif %}; color: #FFFFFF; flex-shrink: 0;">
+      {% if doc.status == 'Expiring Soon' %}
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      {% elif doc.status == 'Expired' %}
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+      {% else %}
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      {% endif %}
+    </div>
+
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+        <span class="status-pill {{ doc.urgency_class }}">{{ doc.badge_text }}</span>
+        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--c-charcoal-muted);">Status Classification</span>
+      </div>
+      <h3 style="font-family: var(--font-serif); font-size: 1.45rem; color: var(--c-forest-dark);">
+        {% if doc.days_remaining is not None %}
+          {{ doc.human_delta }} ({{ doc.formatted_expiry_date }})
+        {% else %}
+          Permanent Lifetime Credential &bull; No expiration deadline
+        {% endif %}
+      </h3>
+    </div>
+  </div>
+
+  {% if doc.status == 'Expiring Soon' %}
+    <div style="text-align: right;">
+      <span class="editorial-tag terracotta" style="font-size: 0.8rem;">Renewal Window Active</span>
+      <div style="font-size: 0.8rem; color: var(--c-charcoal-muted); margin-top: 0.3rem;">Notice set for {{ doc.reminder_days }} days prior</div>
+    </div>
+  {% endif %}
+</div>
+
+<!-- ==========================================================================
+     TWO-COLUMN SPECIFICATION & FILE PREVIEW
+     ========================================================================== -->
+<div class="detail-split-grid">
+  <!-- Left Column: Metadata & Renewal Guide -->
+  <div>
+    <!-- Metadata Spec Card -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <div>
+          <div class="editorial-tag" style="margin-bottom: 0.3rem;">Archive Record #{{ doc.id_str|slice:":8" }}</div>
+          <h2 style="font-size: 1.5rem; font-weight: 500; color: var(--c-forest-dark);">{{ doc.title }}</h2>
+        </div>
+        <span class="category-pill">{{ doc.category }}</span>
+      </div>
+
+      <div class="panel-body">
+        <div class="meta-key-value-list">
+          <div class="meta-row">
+            <span class="meta-label">Document / Policy Number</span>
+            <span class="meta-val" style="font-family: var(--font-mono);">{{ doc.document_number|default:"—" }}</span>
+          </div>
+
+          <div class="meta-row">
+            <span class="meta-label">Issuing Authority</span>
+            <span class="meta-val">{{ doc.issuing_authority|default:"Self-certified" }}</span>
+          </div>
+
+          <div class="meta-row">
+            <span class="meta-label">Date of Issue</span>
+            <span class="meta-val">{{ doc.formatted_issue_date }}</span>
+          </div>
+
+          <div class="meta-row">
+            <span class="meta-label">Date of Expiration</span>
+            <span class="meta-val">{{ doc.formatted_expiry_date }}</span>
+          </div>
+
+          <div class="meta-row">
+            <span class="meta-label">Configured Advance Warning</span>
+            <span class="meta-val">{{ doc.reminder_days }} days before deadline</span>
+          </div>
+
+          <div class="meta-row" style="border-bottom: none;">
+            <span class="meta-label">MongoDB Record Hash</span>
+            <span class="meta-val" style="font-family: var(--font-mono); font-size: 0.78rem;">{{ doc.id_str }}</span>
+          </div>
+        </div>
+
+        {% if doc.notes %}
+          <div class="editorial-rule"></div>
+          <div>
+            <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--c-forest-dark); margin-bottom: 0.5rem;">
+              Archival Directives & Notes:
+            </h4>
+            <div style="background: var(--c-ivory); border: 1px solid var(--c-border); padding: 1rem 1.25rem; border-radius: 4px; font-size: 0.92rem; color: var(--c-charcoal); line-height: 1.6; white-space: pre-wrap;">
+              {{ doc.notes }}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Interactive Renewal Checklist -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3 class="panel-title">Renewal Action Protocol</h3>
+      </div>
+      <div class="panel-body">
+        <div style="display: flex; flex-direction: column; gap: 0.95rem;">
+          <label style="display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.92rem; cursor: pointer;">
+            <input type="checkbox" style="margin-top: 4px; accent-color: var(--c-forest);">
+            <span><strong>Verify Validity Requirements:</strong> Check if your destination or employer requires a 6-month buffer beyond current expiry.</span>
+          </label>
+          <label style="display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.92rem; cursor: pointer;">
+            <input type="checkbox" style="margin-top: 4px; accent-color: var(--c-forest);">
+            <span><strong>Gather Supporting Records:</strong> Keep your document reference (<code>{{ doc.document_number|default:"N/A" }}</code>) on hand during application.</span>
+          </label>
+          <label style="display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.92rem; cursor: pointer;">
+            <input type="checkbox" style="margin-top: 4px; accent-color: var(--c-forest);">
+            <span><strong>Update Vault on Completion:</strong> Once new credential arrives, update issue and expiry dates to reset the chronometer.</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Visual File Preview -->
+  <div>
+    <div class="panel-card">
+      <div class="panel-header">
+        <div>
+          <h3 class="panel-title">Attached Document Asset</h3>
+          <span style="font-size: 0.82rem; color: var(--c-charcoal-subtle);">Authentic cryptographic scan</span>
+        </div>
+        {% if doc.file_url %}
+          <a href="{{ doc.file_url }}" target="_blank" download class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Download</span>
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="panel-body" style="padding: 1.25rem;">
+        {% if doc.file_url %}
+          {% if doc.file_type == 'image' %}
+            <div style="border-radius: 4px; overflow: hidden; border: 1px solid var(--c-border-strong); box-shadow: var(--shadow-sm); background: #000; cursor: pointer;" class="trigger-lightbox" data-img-src="{{ doc.file_url }}" title="Click to expand lightbox">
+              <img src="{{ doc.file_url }}" alt="{{ doc.title }}" style="width: 100%; max-height: 460px; object-fit: contain; margin: 0 auto; transition: transform var(--transition-fast);">
+            </div>
+            <div style="text-align: center; margin-top: 0.85rem;">
+              <button type="button" class="btn btn-subtle btn-sm trigger-lightbox" data-img-src="{{ doc.file_url }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                <span>Interactive Lightbox Zoom</span>
+              </button>
+            </div>
+          {% elif doc.file_type == 'pdf' %}
+            <div style="height: 440px; border: 1px solid var(--c-border); border-radius: 4px; overflow: hidden;">
+              <iframe src="{{ doc.file_url }}" width="100%" height="100%" style="border: none;"></iframe>
+            </div>
+          {% else %}
+            <div style="padding: 3rem 1.5rem; text-align: center; background: var(--c-ivory); border-radius: 4px; border: 1px solid var(--c-border);">
+              <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--c-forest-tint); color: var(--c-forest); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              </div>
+              <h4 style="font-size: 1.1rem; color: var(--c-forest-dark); margin-bottom: 0.5rem;">File Attached</h4>
+              <p style="font-size: 0.88rem; color: var(--c-charcoal-muted); margin-bottom: 1.25rem;">
+                This record contains a digital attachment ready for inspection.
+              </p>
+              <a href="{{ doc.file_url }}" target="_blank" class="btn btn-primary btn-sm">Open File in Browser</a>
+            </div>
+          {% endif %}
+        {% else %}
+          <div style="padding: 3.5rem 1.5rem; text-align: center; background: var(--c-ivory); border-radius: 4px; border: 1px dashed var(--c-border-strong);">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--c-ivory-dark); color: var(--c-charcoal-subtle); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            </div>
+            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--c-forest-dark); margin-bottom: 0.4rem;">No File Scan Uploaded</h4>
+            <p style="font-size: 0.88rem; color: var(--c-charcoal-muted); margin-bottom: 1.25rem;">
+              You can attach a PDF scan or photo by updating this record.
+            </p>
+            <a href="{% url 'document_edit' doc.id %}" class="btn btn-secondary btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Attach File Now</span>
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     IMAGE LIGHTBOX MODAL
+     ========================================================================== -->
+<div id="imageLightboxModal" class="image-lightbox-modal">
+  <div class="lightbox-image-wrap">
+    <button class="lightbox-close-btn" aria-label="Close Lightbox">&times;</button>
+    <img id="lightboxActiveImage" src="" alt="Enlarged document preview">
+    <div style="color: var(--c-ivory); font-size: 0.85rem; margin-top: 1rem; font-family: var(--font-mono);">
+      Press ESC or click outside to dismiss
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     BESPOKE EDITORIAL DELETION MODAL
+     ========================================================================== -->
+<div id="editorialDeleteModal" class="editorial-modal-backdrop">
+  <div class="editorial-modal-card">
+    <div style="width: 48px; height: 48px; border-radius: 50%; background: #FDE8E8; color: #B93838; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    </div>
+    <h3 style="font-family: var(--font-serif); font-size: 1.4rem; color: var(--c-forest-dark); margin-bottom: 0.5rem;">
+      Delete Document Record?
+    </h3>
+    <p style="font-size: 0.92rem; color: var(--c-charcoal-muted); line-height: 1.6; margin-bottom: 1.5rem;">
+      Are you sure you want to permanently remove <strong id="deleteTargetTitle" style="color: var(--c-forest-dark);">this document</strong> from your vault? This will erase associated chronometry and archival metadata.
+    </p>
+
+    <div style="display: flex; justify-content: flex-end; gap: 0.85rem;">
+      <button type="button" id="cancelDeleteBtn" class="btn btn-secondary btn-sm">
+        Cancel
+      </button>
+      <button type="button" id="confirmDeleteBtn" class="btn btn-sm" style="background: #B93838; color: #FFF; border-color: #B93838;">
+        Confirm Permanent Deletion
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="app-layout">
+  <!-- ==========================================================================
+       SIDEBAR NAVIGATION
+       ========================================================================== -->
+  <aside class="app-sidebar">
+    <div class="sidebar-header">
+      <a href="{% url 'landing' %}" class="brand-logo" title="Back to DocumentDock Home">
+        <div class="brand-icon-wrap" style="width: 28px; height: 28px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+        </div>
+        <div class="brand-logo-text" style="font-size: 1.15rem;">Document<span>Dock</span><span class="period">.</span></div>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-title">Vault Workspace</div>
+
+      <a href="{% url 'dashboard' %}" class="sidebar-item {% if active_nav == 'dashboard' %}active{% endif %}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <span>Overview</span>
+      </a>
+
+      <a href="{% url 'documents_list' %}" class="sidebar-item {% if active_nav == 'documents' %}active{% endif %}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        <span>All Documents</span>
+      </a>
+
+      <a href="{% url 'document_add' %}" class="sidebar-item {% if active_nav == 'add_document' %}active{% endif %}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+        <span>Add Document</span>
+      </a>
+
+      <div class="sidebar-section-title" style="margin-top: 1rem;">Filter Views</div>
+
+      <a href="{% url 'documents_list' %}?status=Expiring+Soon" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--c-terracotta);"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        <span>Expiring Soon</span>
+      </a>
+
+      <a href="{% url 'documents_list' %}?status=Expired" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #B93838;"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+        <span>Expired / Lapsed</span>
+      </a>
+
+      <a href="{% url 'documents_list' %}?status=Lifetime" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+        <span>Permanent Records</span>
+      </a>
+
+      <div class="sidebar-section-title" style="margin-top: 1rem;">System</div>
+
+      <div style="padding: 0.85rem; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; margin-top: auto;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <span class="db-pulse"></span>
+          <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; color: #FFFFFF;">MONGODB ENGINE</span>
+        </div>
+        <div style="font-size: 0.74rem; color: var(--c-sage); line-height: 1.35;">
+          PyMongo Data Layer active. Isolated collections.
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile-badge">
+        <div class="user-avatar">
+          {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ request.user.first_name|default:request.user.username }}</span>
+          <span class="user-role">{{ request.user.email|default:"Vault Owner" }}</span>
+        </div>
+        <a href="{% url 'logout' %}" style="margin-left: auto; color: var(--c-charcoal-subtle);" title="Sign out of vault">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==========================================================================
+       MAIN APP STAGE
+       ========================================================================== -->
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle-btn" aria-label="Open sidebar menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <div class="topbar-title">
+          <h1>{% block page_title %}Vault Overview{% endblock %}</h1>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <!-- Quick Global Search in Topbar -->
+        <form method="GET" action="{% url 'documents_list' %}" style="display: flex; align-items: center;">
+          <div style="position: relative;">
+            <input 
+              type="text" 
+              name="q" 
+              placeholder="Search vault records..." 
+              style="padding: 0.4rem 0.75rem 0.4rem 2rem; border-radius: 4px; border: 1px solid var(--c-border-strong); background: var(--c-ivory); font-size: 0.84rem; width: 190px; outline: none; transition: all var(--transition-fast);"
+              onfocus="this.style.width='260px'; this.style.borderColor='var(--c-forest)'; this.style.background='var(--c-white)';" 
+              onblur="this.style.width='190px'; this.style.borderColor='var(--c-border-strong)'; this.style.background='var(--c-ivory)';"
+            >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); color: var(--c-charcoal-subtle); pointer-events: none;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </div>
+        </form>
+
+        <div class="db-pill">
+          <span class="db-pulse"></span>
+          <span>MongoDB Active</span>
+        </div>
+
+        <a href="{% url 'document_add' %}" class="btn btn-primary btn-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Add Document</span>
+        </a>
+      </div>
+    </header>
+
+    <div class="app-content">
+      {% block app_content %}{% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

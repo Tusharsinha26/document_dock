@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In to Vault — DocumentDock{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <!-- Left Editorial Hero Pane -->
+  <div class="auth-hero-pane">
+    <a href="{% url 'landing' %}" class="brand-logo" style="color: var(--c-ivory);">
+      <div class="brand-icon-wrap" style="background: var(--c-ivory); color: var(--c-forest);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+      </div>
+      <div class="brand-logo-text" style="color: var(--c-ivory);">Document<span style="color: var(--c-sage);">Dock</span><span class="period" style="color: var(--c-terracotta);">.</span></div>
+    </a>
+
+    <div style="position: relative; z-index: 2; margin: 4rem 0;">
+      <div class="editorial-tag" style="background: rgba(255,255,255,0.12); color: var(--c-ivory); border-color: rgba(255,255,255,0.2); margin-bottom: 1.5rem;">
+        Archival Security
+      </div>
+      <h1 style="color: var(--c-ivory); font-size: clamp(2rem, 3.5vw, 3rem); line-height: 1.15; margin-bottom: 1.25rem;">
+        Order is not the absence of chaos. It is the mastery of deadlines.
+      </h1>
+      <p style="color: var(--c-sage); font-size: 1.05rem; line-height: 1.6; max-width: 480px;">
+        Access your personal ledger of biometric passports, insurance policies, property deeds, and certificates.
+      </p>
+    </div>
+
+    <div style="position: relative; z-index: 2; font-family: var(--font-mono); font-size: 0.76rem; color: var(--c-sage-dark);">
+      DocumentDock Platform &bull; Python & MongoDB Enterprise Protocol
+    </div>
+  </div>
+
+  <!-- Right Form Pane -->
+  <div class="auth-form-pane">
+    <div class="auth-box">
+      <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 1.9rem; font-weight: 500; color: var(--c-forest-dark); margin-bottom: 0.5rem;">
+          Sign in to your vault
+        </h2>
+        <p style="font-size: 0.95rem; color: var(--c-charcoal-muted);">
+          Enter your credentials to unlock your document repository.
+        </p>
+      </div>
+
+      <!-- Quick Demo Access Banner for College Evaluation / Instant Review -->
+      <div style="background: var(--c-terracotta-light); border: 1px solid var(--c-terracotta-border); border-radius: 4px; padding: 1.1rem; margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+          <span style="font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600; color: var(--c-terracotta-dark);">EXPRESS EVALUATION</span>
+          <span class="status-pill status-warning" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">1-Click</span>
+        </div>
+        <p style="font-size: 0.86rem; color: var(--c-charcoal); line-height: 1.45; margin-bottom: 0.75rem;">
+          Evaluating this project? Enter immediately without signing up using our populated demo vault.
+        </p>
+        <a href="{% url 'demo_login' %}" class="btn btn-terracotta btn-sm" style="width: 100%;">
+          <span>Launch Interactive Demo Vault</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 1.5rem; position: relative;">
+        <div class="editorial-rule" style="margin: 0;"></div>
+        <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--c-ivory); padding: 0 0.85rem; font-family: var(--font-mono); font-size: 0.74rem; color: var(--c-charcoal-subtle);">
+          OR WITH USERNAME
+        </span>
+      </div>
+
+      <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label" for="username">Username</label>
+          <input type="text" id="username" name="username" class="form-input" placeholder="e.g. eleanor.vance" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+            <label class="form-label" for="password" style="margin-bottom: 0;">Password</label>
+          </div>
+          <input type="password" id="password" name="password" class="form-input" placeholder="••••••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 0.5rem;">
+          <span>Unlock Private Vault</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </form>
+
+      <div style="margin-top: 2rem; text-align: center; font-size: 0.92rem; color: var(--c-charcoal-muted);">
+        Don't have a private vault yet?
+        <a href="{% url 'register' %}" style="font-weight: 600; color: var(--c-forest); text-decoration: underline;">
+          Create an account
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

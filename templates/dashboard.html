@@ -1,0 +1,312 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Overview — DocumentDock{% endblock %}
+{% block page_title %}Vault Overview{% endblock %}
+
+{% block app_content %}
+<!-- Editorial Welcome Strip -->
+<div style="margin-bottom: 2.2rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1.25rem;">
+  <div>
+    <div class="editorial-tag" style="margin-bottom: 0.5rem;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      <span>Ledger Status &bull; Synchronized</span>
+    </div>
+    <h2 style="font-size: 2rem; font-weight: 500; color: var(--c-forest-dark);">
+      Good day, {{ request.user.first_name|default:request.user.username }}.
+    </h2>
+    <p style="font-size: 0.98rem; color: var(--c-charcoal-muted); margin-top: 0.25rem;">
+      Here is the operational status of your archival vault and renewal chronometry.
+    </p>
+  </div>
+
+  <div style="display: flex; gap: 0.85rem; align-items: center;">
+    <a href="{% url 'documents_list' %}" class="btn btn-secondary btn-sm">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+      <span>Browse All Records</span>
+    </a>
+    <a href="{% url 'document_add' %}" class="btn btn-primary btn-sm">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      <span>Archive Document</span>
+    </a>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     SUMMARY METRICS ROW
+     ========================================================================== -->
+<div class="metrics-grid">
+  <!-- Total -->
+  <a href="{% url 'documents_list' %}" class="metric-card" style="text-decoration: none; color: inherit;">
+    <div class="metric-card-top">
+      <span class="metric-label">Total Documents</span>
+      <div class="metric-icon-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+      </div>
+    </div>
+    <div class="metric-number">{{ metrics.total_documents }}</div>
+    <div class="metric-sub">
+      <span>Across {{ metrics.categories_breakdown|length }} life categories</span>
+      <span style="color: var(--c-forest);">&rarr;</span>
+    </div>
+  </a>
+
+  <!-- Active / Protected -->
+  <a href="{% url 'documents_list' %}?status=Active" class="metric-card alert-active" style="text-decoration: none; color: inherit;">
+    <div class="metric-card-top">
+      <span class="metric-label">Active & Valid</span>
+      <div class="metric-icon-wrap" style="background: var(--c-forest-tint); color: var(--c-forest);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      </div>
+    </div>
+    <div class="metric-number" style="color: var(--c-forest);">{{ metrics.active_documents }}</div>
+    <div class="metric-sub">
+      <span>Healthy standing without action</span>
+      <span style="color: var(--c-forest);">&rarr;</span>
+    </div>
+  </a>
+
+  <!-- Expiring Soon -->
+  <a href="{% url 'documents_list' %}?status=Expiring+Soon" class="metric-card alert-urgent" style="text-decoration: none; color: inherit;">
+    <div class="metric-card-top">
+      <span class="metric-label" style="color: var(--c-terracotta-dark);">Expiring Soon</span>
+      <div class="metric-icon-wrap" style="background: var(--c-terracotta-light); color: var(--c-terracotta);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      </div>
+    </div>
+    <div class="metric-number urgent">{{ metrics.expiring_soon }}</div>
+    <div class="metric-sub">
+      <span>Within notice window</span>
+      <span style="color: var(--c-terracotta);">&rarr;</span>
+    </div>
+  </a>
+
+  <!-- Expired / Action -->
+  <a href="{% url 'documents_list' %}?status=Expired" class="metric-card alert-expired" style="text-decoration: none; color: inherit;">
+    <div class="metric-card-top">
+      <span class="metric-label" style="color: #B93838;">Expired / Lapsed</span>
+      <div class="metric-icon-wrap" style="background: #FDF2F2; color: #B93838;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+      </div>
+    </div>
+    <div class="metric-number expired">{{ metrics.expired }}</div>
+    <div class="metric-sub">
+      <span>Immediate renewal required</span>
+      <span style="color: #B93838;">&rarr;</span>
+    </div>
+  </a>
+</div>
+
+<!-- ==========================================================================
+     TWO-COLUMN MAIN CONTENT: TIMELINE & BREAKDOWN
+     ========================================================================== -->
+<div class="dashboard-split-grid">
+  <!-- Left Main Column: Timeline & Recent Uploads -->
+  <div>
+    <!-- Upcoming Expiry Timeline -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <div>
+          <h3 class="panel-title">Upcoming Expiry Timeline</h3>
+          <span style="font-size: 0.82rem; color: var(--c-charcoal-subtle);">Chronological renewal radar</span>
+        </div>
+        <a href="{% url 'documents_list' %}?sort=expiry_asc" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 0.35rem 0.8rem;">
+          View Full Timeline &rarr;
+        </a>
+      </div>
+
+      <div class="expiry-timeline-list">
+        {% if metrics.timeline_docs %}
+          {% for doc in metrics.timeline_docs %}
+            <div class="timeline-row">
+              <div class="timeline-row-left">
+                <div class="doc-icon-badge" style="background: {{ doc.category_meta.bg }}; color: {{ doc.category_meta.color }};">
+                  {% if doc.category == 'Identity & Travel' %}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  {% elif doc.category == 'Vehicles & Transport' %}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect><circle cx="6" cy="12" r="2"></circle><circle cx="18" cy="12" r="2"></circle></svg>
+                  {% elif doc.category == 'Insurance & Health' %}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                  {% else %}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                  {% endif %}
+                </div>
+
+                <div class="timeline-doc-info">
+                  <a href="{% url 'document_detail' doc.id %}" class="timeline-doc-title">
+                    {{ doc.title }}
+                  </a>
+                  <div class="timeline-doc-meta">
+                    <span class="category-pill" style="font-size: 0.72rem; padding: 0.15rem 0.5rem;">{{ doc.category }}</span>
+                    <span>&bull;</span>
+                    <span style="font-family: var(--font-mono);">{{ doc.document_number|default:"No reference" }}</span>
+                    <span>&bull;</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.76rem;">{{ doc.formatted_expiry_date }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timeline-row-right">
+                <span class="status-pill {{ doc.urgency_class }}">
+                  {{ doc.human_delta }}
+                </span>
+                <a href="{% url 'document_detail' doc.id %}" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">
+                  Inspect &rarr;
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div style="padding: 3rem 2rem; text-align: center; color: var(--c-charcoal-subtle);">
+            No upcoming document expiries recorded yet.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Recent Document Records Table -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <div>
+          <h3 class="panel-title">Recent Document Records</h3>
+          <span style="font-size: 0.82rem; color: var(--c-charcoal-subtle);">Latest additions to your MongoDB repository</span>
+        </div>
+        <a href="{% url 'documents_list' %}" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 0.35rem 0.8rem;">
+          View All Records &rarr;
+        </a>
+      </div>
+
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>DOCUMENT TITLE</th>
+              <th>CATEGORY</th>
+              <th>EXPIRY DATE</th>
+              <th>STATUS</th>
+              <th style="text-align: right;">ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in metrics.recent_uploads %}
+              <tr>
+                <td>
+                  <a href="{% url 'document_detail' doc.id %}" class="table-doc-title">
+                    {{ doc.title }}
+                  </a>
+                  <div class="table-doc-number">{{ doc.issuing_authority|default:"Self-certified" }}</div>
+                </td>
+                <td>
+                  <span class="category-pill">{{ doc.category }}</span>
+                </td>
+                <td>
+                  <span style="font-family: var(--font-mono); font-size: 0.84rem;">{{ doc.formatted_expiry_date }}</span>
+                </td>
+                <td>
+                  <span class="status-pill {{ doc.urgency_class }}">{{ doc.badge_text }}</span>
+                </td>
+                <td style="text-align: right;">
+                  <a href="{% url 'document_detail' doc.id %}" class="btn btn-secondary btn-sm" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">
+                    Inspect
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Sidebar Widgets Column -->
+  <div>
+    <!-- Vault Health & Protection Gauge Card -->
+    <div class="panel-card" style="border-top: 4px solid var(--c-forest);">
+      <div class="panel-body" style="padding: 1.75rem; text-align: center;">
+        <div class="editorial-tag" style="margin-bottom: 1rem; font-size: 0.72rem;">Compliance Health</div>
+        <div style="position: relative; width: 125px; height: 125px; margin: 0 auto 1.25rem;">
+          <svg viewBox="0 0 36 36" style="width: 100%; height: 100%; transform: rotate(-90deg);">
+            <!-- Background Ring -->
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--c-ivory-dark)" stroke-width="3.2" />
+            <!-- Active Fill Ring -->
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--c-forest)" stroke-width="3.2" stroke-dasharray="86, 100" stroke-linecap="round" />
+          </svg>
+          <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 600; color: var(--c-forest-dark); line-height: 1;">86%</span>
+            <span style="font-size: 0.68rem; color: var(--c-charcoal-subtle); text-transform: uppercase; font-family: var(--font-mono); margin-top: 2px;">Protected</span>
+          </div>
+        </div>
+        <h4 style="font-size: 1.1rem; font-weight: 600; color: var(--c-forest-dark); margin-bottom: 0.4rem;">Vault Standing: Favorable</h4>
+        <p style="font-size: 0.86rem; color: var(--c-charcoal-muted); line-height: 1.5; margin: 0;">
+          {{ metrics.active_documents }} of {{ metrics.total_documents }} documents in good standing. {{ metrics.expiring_soon }} entering notice window.
+        </p>
+      </div>
+    </div>
+
+    <!-- Category Distribution Breakdown -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <div>
+          <h3 class="panel-title">Vault Composition</h3>
+          <span style="font-size: 0.82rem; color: var(--c-charcoal-subtle);">Records across life domains</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="category-bars-list">
+          {% for cat in metrics.categories_breakdown %}
+            <a href="{% url 'documents_list' %}?category={{ cat.name|urlencode }}" class="category-bar-row" style="text-decoration: none; color: inherit; padding: 0.4rem 0.5rem; border-radius: var(--radius-sm); transition: background 0.15s ease;" onmouseover="this.style.backgroundColor='var(--c-ivory-light)'" onmouseout="this.style.backgroundColor='transparent'">
+              <div class="category-bar-label-line">
+                <span style="font-weight: 500; font-size: 0.9rem;">{{ cat.name }}</span>
+                <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--c-charcoal-subtle);">
+                  {{ cat.count }} record{% if cat.count != 1 %}s{% endif %} ({{ cat.percentage }}%) &rarr;
+                </span>
+              </div>
+              <div class="category-bar-track">
+                <div class="category-bar-fill" style="width: {{ cat.percentage }}%; background-color: {{ cat.meta.color }};"></div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Security & Architecture Card -->
+    <div class="panel-card" style="background: linear-gradient(145deg, var(--c-forest) 0%, var(--c-forest-dark) 100%); color: var(--c-ivory); border-color: var(--c-forest-dark);">
+      <div class="panel-body" style="padding: 1.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--c-sage);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <h4 style="font-family: var(--font-serif); font-size: 1.2rem; color: var(--c-ivory);">Engine & Integrity</h4>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--c-sage); line-height: 1.55; margin-bottom: 1.25rem;">
+          Your vault is bound to user ID <code>#{{ request.user.id }}</code> in the MongoDB data store. All document dates are analyzed dynamically on query without storing rigid countdown timestamps.
+        </p>
+
+        <div style="background: rgba(0, 0, 0, 0.25); padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.76rem; color: var(--c-sage-light); border: 1px solid rgba(255,255,255,0.08);">
+          Data Engine: {{ metrics.db_status }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Archival Actions -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3 class="panel-title">Quick Actions</h3>
+      </div>
+      <div class="panel-body" style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <a href="{% url 'document_add' %}" class="btn btn-subtle" style="justify-content: flex-start;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+          <span>Catalog New Travel Document</span>
+        </a>
+        <a href="{% url 'documents_list' %}?status=Expiring+Soon" class="btn btn-secondary" style="justify-content: flex-start;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--c-terracotta);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <span>Audit Expiring Soon Items ({{ metrics.expiring_soon }})</span>
+        </a>
+        <a href="{% url 'export_vault' %}" class="btn btn-secondary" style="justify-content: flex-start;" title="Download complete JSON ledger export">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Export Vault Backup (JSON)</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
