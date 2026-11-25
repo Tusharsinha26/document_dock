@@ -293,38 +293,53 @@
 
 {% block extra_js %}
 <script>
-  // Table / Grid Switcher
+  // Table / Grid Switcher with Smooth Crossfade & LocalStorage Persistence
   const tableBtn = document.getElementById('toggleTableViewBtn');
   const gridBtn = document.getElementById('toggleGridViewBtn');
   const tableContainer = document.getElementById('tableViewContainer');
   const gridContainer = document.getElementById('gridViewContainer');
 
-  if (tableBtn && gridBtn && tableContainer && gridContainer) {
-    gridBtn.addEventListener('click', () => {
-      tableContainer.style.display = 'none';
-      gridContainer.style.display = 'block';
-      gridBtn.style.background = 'var(--c-white)';
-      gridBtn.style.color = 'var(--c-charcoal)';
-      gridBtn.style.borderColor = 'var(--c-border)';
-      gridBtn.style.boxShadow = 'var(--shadow-subtle)';
-      tableBtn.style.background = 'transparent';
-      tableBtn.style.color = 'var(--c-charcoal-muted)';
-      tableBtn.style.borderColor = 'transparent';
-      tableBtn.style.boxShadow = 'none';
-    });
+  function setGridView() {
+    if (!tableContainer || !gridContainer) return;
+    tableContainer.style.display = 'none';
+    gridContainer.style.display = 'block';
+    gridContainer.style.animation = 'fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+    gridBtn.style.background = 'var(--c-white)';
+    gridBtn.style.color = 'var(--c-charcoal)';
+    gridBtn.style.borderColor = 'var(--c-border)';
+    gridBtn.style.boxShadow = 'var(--shadow-subtle)';
+    tableBtn.style.background = 'transparent';
+    tableBtn.style.color = 'var(--c-charcoal-muted)';
+    tableBtn.style.borderColor = 'transparent';
+    tableBtn.style.boxShadow = 'none';
+    localStorage.setItem('documentdock_view_pref', 'grid');
+  }
 
-    tableBtn.addEventListener('click', () => {
-      gridContainer.style.display = 'none';
-      tableContainer.style.display = 'block';
-      tableBtn.style.background = 'var(--c-white)';
-      tableBtn.style.color = 'var(--c-charcoal)';
-      tableBtn.style.borderColor = 'var(--c-border)';
-      tableBtn.style.boxShadow = 'var(--shadow-subtle)';
-      gridBtn.style.background = 'transparent';
-      gridBtn.style.color = 'var(--c-charcoal-muted)';
-      gridBtn.style.borderColor = 'transparent';
-      gridBtn.style.boxShadow = 'none';
-    });
+  function setTableView() {
+    if (!tableContainer || !gridContainer) return;
+    gridContainer.style.display = 'none';
+    tableContainer.style.display = 'block';
+    tableContainer.style.animation = 'fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+    tableBtn.style.background = 'var(--c-white)';
+    tableBtn.style.color = 'var(--c-charcoal)';
+    tableBtn.style.borderColor = 'var(--c-border)';
+    tableBtn.style.boxShadow = 'var(--shadow-subtle)';
+    gridBtn.style.background = 'transparent';
+    gridBtn.style.color = 'var(--c-charcoal-muted)';
+    gridBtn.style.borderColor = 'transparent';
+    gridBtn.style.boxShadow = 'none';
+    localStorage.setItem('documentdock_view_pref', 'table');
+  }
+
+  if (tableBtn && gridBtn && tableContainer && gridContainer) {
+    gridBtn.addEventListener('click', setGridView);
+    tableBtn.addEventListener('click', setTableView);
+
+    // Restore saved view preference
+    const savedPref = localStorage.getItem('documentdock_view_pref');
+    if (savedPref === 'grid') {
+      setGridView();
+    }
   }
 </script>
 {% endblock %}

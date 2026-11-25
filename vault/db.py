@@ -18,9 +18,11 @@ import gridfs
 from bson import ObjectId
 
 # Path for persistent fallback JSON storage if MongoDB daemon is unreachable
-FALLBACK_DATA_DIR = Path(settings.BASE_DIR) / 'data'
-FALLBACK_DATA_DIR.mkdir(exist_ok=True)
+IS_VERCEL = bool(os.environ.get('VERCEL'))
+FALLBACK_DATA_DIR = Path('/tmp/documentdock_data') if IS_VERCEL else Path(settings.BASE_DIR) / 'data'
+FALLBACK_DATA_DIR.mkdir(parents=True, exist_ok=True)
 FALLBACK_DB_FILE = FALLBACK_DATA_DIR / 'documents_store.json'
+FALLBACK_MEDIA_DIR = Path('/tmp/documentdock_media') if IS_VERCEL else Path(settings.MEDIA_ROOT)
 
 
 class JSONFallbackCollection:
@@ -154,8 +156,12 @@ def get_db():
     global _mongo_client, _db_connection_status, _connection_attempted
     if not _connection_attempted:
         _connection_attempted = True
-        uri = getattr(settings, 'MONGODB_URI', 'mongodb://localhost:27017/')
+        uri = getattr(settings, 'MONGODB_URI', 'mongodb://localhost:27017/').strip()
         db_name = getattr(settings, 'MONGODB_DB_NAME', 'documentdock_db')
+        if IS_VERCEL and (not uri or 'localhost' in uri or '127.0.0.1' in uri):
+            _mongo_client = None
+            _db_connection_status = "Temporary Vercel Store (Connect MONGODB_URI for Persistence)"
+            return _mongo_client
         try:
             client = pymongo.MongoClient(
                 uri,
@@ -217,11 +223,16 @@ def store_uploaded_file(file_obj, filename, content_type=None, user_id=None):
             pass
 
     # Local fallback storage
-    from django.core.files.storage import default_storage
+    from django.core.files.storage import FileSystemStorage, default_storage
     safe_filename = f"{uuid.uuid4().hex[:12]}_{filename.replace(' ', '_')}"
     upload_path = os.path.join('documents', safe_filename)
     file_obj.seek(0)
-    saved_path = default_storage.save(upload_path, file_obj)
+    if IS_VERCEL:
+        FALLBACK_MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+        tmp_storage = FileSystemStorage(location=str(FALLBACK_MEDIA_DIR))
+        saved_path = tmp_storage.save(upload_path, file_obj)
+    else:
+        saved_path = default_storage.save(upload_path, file_obj)
     return {
         'storage_type': 'local',
         'gridfs_id': None,

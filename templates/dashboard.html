@@ -44,7 +44,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
       </div>
     </div>
-    <div class="metric-number">{{ metrics.total_documents }}</div>
+    <div class="metric-number counter-anim" data-target="{{ metrics.total_documents }}">{{ metrics.total_documents }}</div>
     <div class="metric-sub">
       <span>Across {{ metrics.categories_breakdown|length }} life categories</span>
       <span style="color: var(--c-forest);">&rarr;</span>
@@ -59,7 +59,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
       </div>
     </div>
-    <div class="metric-number" style="color: var(--c-forest);">{{ metrics.active_documents }}</div>
+    <div class="metric-number counter-anim" style="color: var(--c-forest);" data-target="{{ metrics.active_documents }}">{{ metrics.active_documents }}</div>
     <div class="metric-sub">
       <span>Healthy standing without action</span>
       <span style="color: var(--c-forest);">&rarr;</span>
@@ -74,7 +74,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
       </div>
     </div>
-    <div class="metric-number urgent">{{ metrics.expiring_soon }}</div>
+    <div class="metric-number urgent counter-anim" data-target="{{ metrics.expiring_soon }}">{{ metrics.expiring_soon }}</div>
     <div class="metric-sub">
       <span>Within notice window</span>
       <span style="color: var(--c-terracotta);">&rarr;</span>
@@ -89,7 +89,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
       </div>
     </div>
-    <div class="metric-number expired">{{ metrics.expired }}</div>
+    <div class="metric-number expired counter-anim" data-target="{{ metrics.expired }}">{{ metrics.expired }}</div>
     <div class="metric-sub">
       <span>Immediate renewal required</span>
       <span style="color: #B93838;">&rarr;</span>
@@ -229,10 +229,10 @@
             <!-- Background Ring -->
             <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--c-ivory-dark)" stroke-width="3.2" />
             <!-- Active Fill Ring -->
-            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--c-forest)" stroke-width="3.2" stroke-dasharray="86, 100" stroke-linecap="round" />
+            <path id="complianceGaugeRing" class="gauge-anim-ring" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--c-forest)" stroke-width="3.2" stroke-dasharray="0, 100" data-dash="86, 100" stroke-linecap="round" style="transition: stroke-dasharray 1.4s cubic-bezier(0.16, 1, 0.3, 1);" />
           </svg>
           <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <span style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 600; color: var(--c-forest-dark); line-height: 1;">86%</span>
+            <span class="counter-anim" data-target="86" data-suffix="%" style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 600; color: var(--c-forest-dark); line-height: 1;">86%</span>
             <span style="font-size: 0.68rem; color: var(--c-charcoal-subtle); text-transform: uppercase; font-family: var(--font-mono); margin-top: 2px;">Protected</span>
           </div>
         </div>

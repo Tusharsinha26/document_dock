@@ -139,23 +139,27 @@
     </div>
 
     <!-- Interactive Renewal Checklist -->
-    <div class="panel-card">
+    <div class="panel-card" id="renewalProtocolCard">
       <div class="panel-header">
-        <h3 class="panel-title">Renewal Action Protocol</h3>
+        <div>
+          <h3 class="panel-title">Renewal Action Protocol</h3>
+          <span style="font-size: 0.8rem; color: var(--c-charcoal-subtle);">Actionable compliance checklist</span>
+        </div>
+        <span id="checklistProgressBadge" class="editorial-tag" style="font-size: 0.72rem;">0 of 3 Completed</span>
       </div>
       <div class="panel-body">
         <div style="display: flex; flex-direction: column; gap: 0.95rem;">
-          <label style="display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.92rem; cursor: pointer;">
-            <input type="checkbox" style="margin-top: 4px; accent-color: var(--c-forest);">
-            <span><strong>Verify Validity Requirements:</strong> Check if your destination or employer requires a 6-month buffer beyond current expiry.</span>
+          <label class="checklist-item-row" style="display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.92rem; cursor: pointer; padding: 0.5rem; border-radius: 4px; transition: background 0.15s ease;">
+            <input type="checkbox" class="checklist-checkbox" data-doc-id="{{ doc.id }}" data-idx="0" style="margin-top: 4px; width: 16px; height: 16px; accent-color: var(--c-forest); cursor: pointer;">
+            <span class="checklist-item-text"><strong>Verify Validity Requirements:</strong> Check if your destination or employer requires a 6-month buffer beyond current expiry.</span>
           </label>
-          <label style="display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.92rem; cursor: pointer;">
-            <input type="checkbox" style="margin-top: 4px; accent-color: var(--c-forest);">
-            <span><strong>Gather Supporting Records:</strong> Keep your document reference (<code>{{ doc.document_number|default:"N/A" }}</code>) on hand during application.</span>
+          <label class="checklist-item-row" style="display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.92rem; cursor: pointer; padding: 0.5rem; border-radius: 4px; transition: background 0.15s ease;">
+            <input type="checkbox" class="checklist-checkbox" data-doc-id="{{ doc.id }}" data-idx="1" style="margin-top: 4px; width: 16px; height: 16px; accent-color: var(--c-forest); cursor: pointer;">
+            <span class="checklist-item-text"><strong>Gather Supporting Records:</strong> Keep your document reference (<code>{{ doc.document_number|default:"N/A" }}</code>) on hand during application.</span>
           </label>
-          <label style="display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.92rem; cursor: pointer;">
-            <input type="checkbox" style="margin-top: 4px; accent-color: var(--c-forest);">
-            <span><strong>Update Vault on Completion:</strong> Once new credential arrives, update issue and expiry dates to reset the chronometer.</span>
+          <label class="checklist-item-row" style="display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.92rem; cursor: pointer; padding: 0.5rem; border-radius: 4px; transition: background 0.15s ease;">
+            <input type="checkbox" class="checklist-checkbox" data-doc-id="{{ doc.id }}" data-idx="2" style="margin-top: 4px; width: 16px; height: 16px; accent-color: var(--c-forest); cursor: pointer;">
+            <span class="checklist-item-text"><strong>Update Vault on Completion:</strong> Once new credential arrives, update issue and expiry dates to reset the chronometer.</span>
           </label>
         </div>
       </div>
